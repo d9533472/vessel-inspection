@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>船舶檢查清單 - NMDC STANDARD</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -16,6 +18,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
             line-height: 1.6;
+            padding-top: 80px;
         }
 
         .container {
@@ -35,27 +38,29 @@
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 24px;
             margin-bottom: 10px;
         }
 
         .toolbar {
             background: #f8f9fa;
-            padding: 15px 30px;
+            padding: 15px;
             border-bottom: 2px solid #e9ecef;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
+            justify-content: center;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 10px 15px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .btn-primary { background: #667eea; color: white; }
@@ -69,36 +74,19 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        .content {
-            padding: 30px;
+        .btn:active {
+            transform: translateY(0);
         }
 
-        .info-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .info-item label {
-            font-weight: 600;
-            color: #495057;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .info-item input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
+        .progress-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 20px;
         }
 
         .progress-bar {
@@ -106,7 +94,6 @@
             background: #e9ecef;
             border-radius: 15px;
             overflow: hidden;
-            margin-bottom: 20px;
         }
 
         .progress-fill {
@@ -122,6 +109,45 @@
             font-size: 12px;
         }
 
+        .content {
+            padding: 20px;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-section h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .info-item label {
+            font-weight: 600;
+            color: #495057;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .info-item input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -134,14 +160,16 @@
         }
 
         th {
-            padding: 15px;
+            padding: 12px 8px;
             text-align: left;
+            font-size: 13px;
         }
 
         td {
-            padding: 12px 15px;
+            padding: 12px 8px;
             border-bottom: 1px solid #e9ecef;
             vertical-align: top;
+            font-size: 13px;
         }
 
         tbody tr:hover {
@@ -149,28 +177,41 @@
         }
 
         .item-no {
-            width: 60px;
+            width: 50px;
             text-align: center;
             font-weight: 600;
             color: #667eea;
         }
 
+        .item-desc-cn {
+            font-weight: 600;
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+
+        .item-desc-en {
+            color: #6c757d;
+            font-size: 11px;
+        }
+
         .checkbox-group {
             display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
         }
 
         .checkbox-group label {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             cursor: pointer;
+            font-size: 13px;
         }
 
         input[type="radio"] {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
         }
 
         .remarks-input {
@@ -178,24 +219,25 @@
             padding: 8px;
             border: 2px solid #dee2e6;
             border-radius: 6px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
 
         .photo-section {
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .photo-upload-btn {
             background: #4facfe;
             color: white;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
         .photo-upload-btn:hover {
@@ -204,17 +246,24 @@
 
         .photo-gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
         }
 
         .photo-item {
             position: relative;
             border: 2px solid #dee2e6;
-            border-radius: 8px;
+            border-radius: 6px;
             overflow: hidden;
             aspect-ratio: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         .photo-item img {
@@ -225,28 +274,104 @@
 
         .photo-delete {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 3px;
+            right: 3px;
             background: #dc3545;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 25px;
-            height: 25px;
+            width: 22px;
+            height: 22px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             line-height: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 10;
         }
 
         .photo-delete:hover {
             background: #c82333;
         }
 
+        /* Photo Preview Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            padding: 20px;
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #bbb;
+        }
+
         .hidden {
             display: none;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media print {
@@ -255,15 +380,11 @@
                 padding: 0;
             }
             
-            .toolbar {
+            .toolbar, .progress-wrapper {
                 display: none;
             }
 
-            .photo-upload-btn {
-                display: none !important;
-            }
-
-            .photo-delete {
+            .photo-upload-btn, .photo-delete {
                 display: none !important;
             }
 
@@ -271,47 +392,86 @@
                 box-shadow: none;
             }
 
-            table {
-                page-break-inside: auto;
-            }
-
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-
             .photo-gallery {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-                page-break-inside: avoid;
-            }
-
-            .photo-item {
-                border: 1px solid #000;
             }
         }
 
-        @media (max-width: 768px) {
-            .toolbar {
-                flex-direction: column;
+        @media (min-width: 768px) {
+            body {
+                padding-top: 90px;
             }
-            
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
             .info-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .checkbox-group {
-                flex-direction: column;
-                gap: 8px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
             }
 
             .photo-gallery {
                 grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             }
+
+            .content {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .header p {
+                font-size: 12px;
+            }
+
+            th, td {
+                font-size: 12px;
+                padding: 8px 4px;
+            }
+
+            .item-desc-cn {
+                font-size: 13px;
+            }
+
+            .item-desc-en {
+                font-size: 10px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Progress Bar - Fixed at top -->
+    <div class="progress-wrapper">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar">0%</div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>正在生成 PDF...</h3>
+            <p>請稍候，這可能需要幾秒鐘</p>
+        </div>
+    </div>
+
+    <!-- Photo Preview Modal -->
+    <div id="photoModal" class="modal" onclick="closeModal()">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>🚢 船舶檢查清單 SURVEY BOAT CHECK LIST</h1>
@@ -321,16 +481,12 @@
         <div class="toolbar">
             <button class="btn btn-primary" onclick="handleSave()">💾 儲存</button>
             <button class="btn btn-success" onclick="handleLoad()">📂 載入</button>
-            <button class="btn btn-share" onclick="handleShare()">📤 匯出分享</button>
+            <button class="btn btn-share" onclick="handleSharePDF()">📤 分享(手機)</button>
             <button class="btn btn-info" onclick="window.print()">🖨️ 列印</button>
             <button class="btn btn-warning" onclick="handleClear()">🗑️ 清空</button>
         </div>
 
         <div class="content">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressBar">0%</div>
-            </div>
-
             <div class="info-section">
                 <h3>📋 基本資訊 Basic Information</h3>
                 <div class="info-grid">
@@ -356,9 +512,9 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 60px;">項次<br>No.</th>
-                        <th style="width: 35%;">檢查項目<br>Inspection Items</th>
-                        <th style="width: 65%;">檢查結果 / 照片 / 備註<br>Results / Photos / Remarks</th>
+                        <th style="width: 50px;">項次</th>
+                        <th style="width: 35%;">檢查項目</th>
+                        <th style="width: 65%;">檢查結果 / 照片 / 備註</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -458,8 +614,8 @@
                 tr.innerHTML = `
                     <td class="item-no">${item.no}</td>
                     <td>
-                        <div style="font-weight:600;margin-bottom:5px;">${item.cn}</div>
-                        <div style="color:#6c757d;font-size:12px;">${item.en}</div>
+                        <div class="item-desc-cn">${item.cn}</div>
+                        <div class="item-desc-en">${item.en}</div>
                     </td>
                     <td>
                         <div class="checkbox-group">
@@ -518,11 +674,22 @@
                 const photoDiv = document.createElement('div');
                 photoDiv.className = 'photo-item';
                 photoDiv.innerHTML = `
-                    <img src="${photoSrc}" alt="Photo ${index + 1}">
-                    <button class="photo-delete" onclick="deletePhoto(${itemNo}, ${index})" title="刪除照片">×</button>
+                    <img src="${photoSrc}" alt="Photo ${index + 1}" onclick="event.stopPropagation(); openModal('${photoSrc}')">
+                    <button class="photo-delete" onclick="event.stopPropagation(); deletePhoto(${itemNo}, ${index})" title="刪除照片">×</button>
                 `;
                 gallery.appendChild(photoDiv);
             });
+        }
+
+        function openModal(imageSrc) {
+            const modal = document.getElementById('photoModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+        }
+
+        function closeModal() {
+            document.getElementById('photoModal').style.display = 'none';
         }
 
         function deletePhoto(itemNo, photoIndex) {
@@ -581,7 +748,7 @@
                 alert('✅ 檢查表已成功儲存！');
             } catch (e) {
                 if (e.name === 'QuotaExceededError') {
-                    alert('❌ 儲存失敗：照片過多，請減少照片數量或壓縮照片大小。');
+                    alert('❌ 儲存失敗：照片過多，請減少照片數量。');
                 } else {
                     alert('❌ 儲存失敗：' + e.message);
                 }
@@ -658,223 +825,68 @@
             alert('✅ 表單已清空！');
         }
 
-        function generateReportHTML() {
-            // Collect all data
-            const vesselName = document.getElementById('vesselName').value || '未填寫';
-            const port = document.getElementById('port').value || '未填寫';
-            const inspectionDate = document.getElementById('inspectionDate').value || '未填寫';
-            const inspectorName = document.getElementById('inspectorName').value || '未填寫';
-            const signature = document.getElementById('signature').value || '未填寫';
-            const signDate = document.getElementById('signDate').value || '未填寫';
+        async function handleSharePDF() {
+            document.getElementById('loadingOverlay').classList.add('active');
 
-            let tableRows = '';
-            items.forEach(item => {
-                const radios = document.getElementsByName('i' + item.no);
-                let status = '未填寫';
-                let statusColor = '#6c757d';
-                for (let r of radios) {
-                    if (r.checked) {
-                        status = r.value;
-                        if (status === 'YES') statusColor = '#28a745';
-                        else if (status === 'NO') statusColor = '#dc3545';
-                        break;
-                    }
-                }
-                const remarks = document.getElementById('r' + item.no).value || '無';
-
-                let photosHTML = '';
-                if (photoData[item.no] && photoData[item.no].length > 0) {
-                    photosHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;">';
-                    photoData[item.no].forEach(photo => {
-                        photosHTML += `<div style="border:1px solid #ddd;border-radius:8px;overflow:hidden;aspect-ratio:1;">
-                            <img src="${photo}" style="width:100%;height:100%;object-fit:cover;">
-                        </div>`;
-                    });
-                    photosHTML += '</div>';
-                }
-
-                tableRows += `
-                    <tr>
-                        <td style="text-align:center;font-weight:600;color:#667eea;">${item.no}</td>
-                        <td>
-                            <div style="font-weight:600;margin-bottom:5px;">${item.cn}</div>
-                            <div style="color:#6c757d;font-size:12px;">${item.en}</div>
-                        </td>
-                        <td>
-                            <div style="color:${statusColor};font-weight:600;margin-bottom:8px;">狀態: ${status}</div>
-                            <div style="color:#495057;margin-bottom:8px;">備註: ${remarks}</div>
-                            ${photosHTML}
-                        </td>
-                    </tr>
-                `;
-            });
-
-            const html = `<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>船舶檢查報告 - ${vesselName}</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
-            padding: 20px;
-            background: #f8f9fa;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        .header h1 { font-size: 28px; margin-bottom: 10px; }
-        .info-section {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .info-item {
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-            border-left: 3px solid #667eea;
-        }
-        .info-item label {
-            font-weight: 600;
-            color: #495057;
-            font-size: 13px;
-            display: block;
-            margin-bottom: 5px;
-        }
-        .info-item div {
-            color: #212529;
-            font-size: 15px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        thead {
-            background: #1e3c72;
-            color: white;
-        }
-        th {
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-        }
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #e9ecef;
-            vertical-align: top;
-        }
-        tbody tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-        .signature-section {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-top: 2px solid #e9ecef;
-        }
-        @media print {
-            body { padding: 0; background: white; }
-            .container { box-shadow: none; }
-        }
-        @media (max-width: 768px) {
-            .info-grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🚢 船舶檢查報告</h1>
-            <p>SURVEY BOAT INSPECTION REPORT - NMDC STANDARD</p>
-        </div>
-        
-        <div class="info-section">
-            <h3 style="color:#1e3c72;margin-bottom:15px;">📋 基本資訊</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <label>船名 Vessel Name</label>
-                    <div>${vesselName}</div>
-                </div>
-                <div class="info-item">
-                    <label>檢查港口 Port</label>
-                    <div>${port}</div>
-                </div>
-                <div class="info-item">
-                    <label>檢查日期 Date</label>
-                    <div>${inspectionDate}</div>
-                </div>
-                <div class="info-item">
-                    <label>檢查員 Inspector</label>
-                    <div>${inspectorName}</div>
-                </div>
-            </div>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th style="width:60px;">項次</th>
-                    <th style="width:35%;">檢查項目</th>
-                    <th style="width:65%;">檢查結果 / 照片 / 備註</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${tableRows}
-            </tbody>
-        </table>
-
-        <div class="signature-section">
-            <h3 style="color:#1e3c72;margin-bottom:15px;">✍️ 簽名</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <label>檢查員簽名</label>
-                    <div>${signature}</div>
-                </div>
-                <div class="info-item">
-                    <label>簽名日期</label>
-                    <div>${signDate}</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>`;
-
-            return html;
-        }
-
-        async function handleShare() {
             try {
-                const html = generateReportHTML();
-                const blob = new Blob([html], { type: 'text/html' });
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
                 
-                const vesselName = document.getElementById('vesselName').value || '船舶';
+                const vesselName = document.getElementById('vesselName').value || '未命名';
                 const date = document.getElementById('inspectionDate').value || new Date().toISOString().split('T')[0];
-                const fileName = `船舶檢查報告_${vesselName}_${date}.html`;
+                
+                // Generate PDF content
+                let yPos = 20;
+                
+                // Title
+                pdf.setFontSize(16);
+                pdf.text('船舶檢查報告', 105, yPos, { align: 'center' });
+                yPos += 10;
+                
+                // Basic Info
+                pdf.setFontSize(12);
+                pdf.text(`船名: ${vesselName}`, 20, yPos);
+                yPos += 8;
+                pdf.text(`檢查港口: ${document.getElementById('port').value || '未填寫'}`, 20, yPos);
+                yPos += 8;
+                pdf.text(`檢查日期: ${date}`, 20, yPos);
+                yPos += 8;
+                pdf.text(`檢查員: ${document.getElementById('inspectorName').value || '未填寫'}`, 20, yPos);
+                yPos += 15;
 
-                // Check if Web Share API is supported (mainly mobile devices)
+                // Items
+                pdf.setFontSize(10);
+                for (let item of items) {
+                    if (yPos > 260) {
+                        pdf.addPage();
+                        yPos = 20;
+                    }
+
+                    const radios = document.getElementsByName('i' + item.no);
+                    let status = '未填寫';
+                    for (let r of radios) {
+                        if (r.checked) {
+                            status = r.value;
+                            break;
+                        }
+                    }
+                    const remarks = document.getElementById('r' + item.no).value || '無';
+
+                    pdf.text(`${item.no}. ${item.cn}`, 20, yPos);
+                    yPos += 6;
+                    pdf.setFontSize(8);
+                    pdf.text(`狀態: ${status} | 備註: ${remarks}`, 25, yPos);
+                    yPos += 8;
+                    pdf.setFontSize(10);
+                }
+
+                // Save PDF
+                const pdfBlob = pdf.output('blob');
+                const fileName = `船舶檢查報告_${vesselName}_${date}.pdf`;
+
+                // Try to share
                 if (navigator.share && navigator.canShare) {
-                    const file = new File([blob], fileName, { type: 'text/html' });
+                    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
                     
                     if (navigator.canShare({ files: [file] })) {
                         await navigator.share({
@@ -882,12 +894,13 @@
                             text: `檢查日期: ${date}`,
                             files: [file]
                         });
+                        document.getElementById('loadingOverlay').classList.remove('active');
                         return;
                     }
                 }
 
-                // Fallback: Download the file
-                const url = URL.createObjectURL(blob);
+                // Fallback: Download
+                const url = URL.createObjectURL(pdfBlob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = fileName;
@@ -896,15 +909,24 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                alert('✅ 報告已下載！您可以透過檔案管理員分享這個檔案。');
+                document.getElementById('loadingOverlay').classList.remove('active');
+                alert('✅ PDF 已下載！您可以從檔案管理員分享此檔案。');
             } catch (error) {
+                document.getElementById('loadingOverlay').classList.remove('active');
                 if (error.name !== 'AbortError') {
-                    alert('❌ 分享失敗：' + error.message);
+                    alert('❌ 生成 PDF 失敗：' + error.message);
                 }
             }
         }
 
         window.onload = init;
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>
