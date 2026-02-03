@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>船舶檢查清單 - NMDC STANDARD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .toolbar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #11998e; color: white; }
+        .btn-warning { background: #f5576c; color: white; }
+        .btn-info { background: #4facfe; color: white; }
+        .btn-share { background: #ff6b6b; color: white; }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item label {
+            font-weight: 600;
+            color: #495057;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .info-item input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+        }
+
+        .progress-bar {
+            height: 25px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        thead {
+            background: #1e3c72;
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .item-no {
+            width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        input[type="radio"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .remarks-input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .photo-section {
+            margin-top: 10px;
+        }
+
+        .photo-upload-btn {
+            background: #4facfe;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .photo-upload-btn:hover {
+            background: #3a8fdd;
+        }
+
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .photo-item {
+            position: relative;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-delete {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-delete:hover {
+            background: #c82333;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .toolbar {
+                display: none;
+            }
+
+            .photo-upload-btn {
+                display: none !important;
+            }
+
+            .photo-delete {
+                display: none !important;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+
+            table {
+                page-break-inside: auto;
+            }
+
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            .photo-gallery {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                page-break-inside: avoid;
+            }
+
+            .photo-item {
+                border: 1px solid #000;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkbox-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .photo-gallery {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚢 船舶檢查清單 SURVEY BOAT CHECK LIST</h1>
+            <p>NMDC STANDARD RD - 海底管線工程施工船舶環境健康安全檢查表</p>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-primary" onclick="handleSave()">💾 儲存</button>
+            <button class="btn btn-success" onclick="handleLoad()">📂 載入</button>
+            <button class="btn btn-share" onclick="handleShare()">📤 匯出分享</button>
+            <button class="btn btn-info" onclick="window.print()">🖨️ 列印</button>
+            <button class="btn btn-warning" onclick="handleClear()">🗑️ 清空</button>
+        </div>
+
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar">0%</div>
+            </div>
+
+            <div class="info-section">
+                <h3>📋 基本資訊 Basic Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>船名 Vessel Name</label>
+                        <input type="text" id="vesselName" placeholder="輸入船名">
+                    </div>
+                    <div class="info-item">
+                        <label>檢查港口 Port of Inspection</label>
+                        <input type="text" id="port" placeholder="輸入檢查港口">
+                    </div>
+                    <div class="info-item">
+                        <label>檢查日期 Date of Inspection</label>
+                        <input type="date" id="inspectionDate">
+                    </div>
+                    <div class="info-item">
+                        <label>檢查員姓名 Name of Inspector</label>
+                        <input type="text" id="inspectorName" placeholder="輸入檢查員姓名">
+                    </div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">項次<br>No.</th>
+                        <th style="width: 35%;">檢查項目<br>Inspection Items</th>
+                        <th style="width: 65%;">檢查結果 / 照片 / 備註<br>Results / Photos / Remarks</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+
+            <div class="info-section" style="margin-top: 40px;">
+                <h3>✍️ 簽名欄 Signature Section</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>檢查員簽名 Inspector Signature</label>
+                        <input type="text" id="signature" placeholder="檢查員簽名">
+                    </div>
+                    <div class="info-item">
+                        <label>簽名日期 Date</label>
+                        <input type="date" id="signDate">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const items = [
+            {no:1,cn:"船名",en:"Name of Vessel"},
+            {no:2,cn:"遊艇船型",en:"Yacht hull"},
+            {no:3,cn:"航班",en:"Flight"},
+            {no:4,cn:"船籍港",en:"Port of registry"},
+            {no:5,cn:"驗船協會/保險公司",en:"Classification Society/Insurer"},
+            {no:6,cn:"IMO 號碼",en:"IMO No."},
+            {no:7,cn:"船型",en:"Vessel Type"},
+            {no:8,cn:"總噸位",en:"Gross Tonnage"},
+            {no:9,cn:"淨噸位",en:"Net Tonnage"},
+            {no:10,cn:"長度",en:"Length"},
+            {no:11,cn:"船寬",en:"Breadth"},
+            {no:12,cn:"吃水",en:"Draft"},
+            {no:13,cn:"船舶登記證書",en:"Certificate of registry"},
+            {no:14,cn:"航行執照",en:"Navigation License"},
+            {no:15,cn:"最低安全員額證書",en:"Minimum Safe Manning"},
+            {no:16,cn:"救生設備證書",en:"Safety equipment certificates"},
+            {no:17,cn:"安全證書證明書",en:"Safety Attestation certificate"},
+            {no:18,cn:"船舶電台執照",en:"Ship Station License"},
+            {no:19,cn:"船舶保險證書",en:"H & M Insurance Certificate"},
+            {no:20,cn:"P&I 保險證書",en:"P&I Insurance Certificate"},
+            {no:21,cn:"文件/檢查證書",en:"Documents/examination certificates"},
+            {no:22,cn:"檢查港口",en:"Port of Inspection"},
+            {no:23,cn:"檢查日期",en:"Date of Inspection"},
+            {no:24,cn:"檢查員姓名",en:"Name of Inspector"},
+            {no:25,cn:"航行通訊",en:"Navigation Communication"},
+            {no:26,cn:"確保衛星定位及圖像功能運作正常",en:"Verify GPS and pictures are functioning"},
+            {no:27,cn:"更新航海圖及電子海圖為最新版本",en:"Update original and paper charts for the area"},
+            {no:28,cn:"VHF 無線電設備及其他船舶通訊裝置運作正常",en:"Vessel tools (VHF) and other communication"},
+            {no:29,cn:"確保手提式無線電或後備電池處於有效狀態",en:"Battery levels for handheld radios or backup"},
+            {no:30,cn:"救生設備及求生設施",en:"Safety equipment & lifesaving appliances"},
+            {no:31,cn:"救生艇/救生筏是否安全放置並可立即使用",en:"Oxygen Respirator and spare in good condition"},
+            {no:32,cn:"備用救生筏/急救箱需隨時可用且狀態良好",en:"First aid kits stocked and accessible"},
+            {no:33,cn:"緊急情況燈號/信號彈",en:"Emergency Portable pump"},
+            {no:34,cn:"損害控制箱及緊急工具",en:"Damage control box and nursery"},
+            {no:35,cn:"SOPER Kits及防護器材",en:"SOPER Kits and inventory"},
+            {no:36,cn:"水手刀及繩索工具",en:"Painter station & instruction"},
+            {no:37,cn:"浮圈及救生標誌",en:"Fuel Tank Capacity"},
+            {no:38,cn:"鐘響發射裝置及使用說明書",en:"Mechanical and electrical systems"},
+            {no:39,cn:"燃油量是否足夠航行至計畫航程",en:"Generators running smoothly"},
+            {no:40,cn:"油箱儲油量足夠航行並進行緊急操作",en:"Engine running hours versus overhaul"},
+            {no:41,cn:"緊急切斷裝置及油壓系統是否正常工作",en:"Hull oil add no coolant leaks checked"},
+            {no:42,cn:"燃油系統及軟管是否完好無洩漏狀況",en:"Engine oil leaks checked"},
+            {no:43,cn:"核檢發動機冷卻水系統是否正常運作並無洩漏",en:"Check bilge/charge connections"},
+            {no:44,cn:"檢查發動機艙及控制台是否清潔並無洩漏",en:"Inspect propeller and shaft for damage"},
+            {no:45,cn:"檢查螺旋槳及軸承是否運作正常並無損傷",en:"Navigation lights"},
+            {no:46,cn:"確認螺旋槳噴嘴及旋轉機械是否正常運作",en:"Deck lights"},
+            {no:47,cn:"照明系統(導航燈、甲板照明、客艙照明及測量照明)",en:"Air lines / quick closed"},
+            {no:48,cn:"輔助發電機及電源分配箱是否運作正常",en:"Navigation lights systems"},
+            {no:49,cn:"USB充電設備及備用電池是否正常運作",en:"Safety sign"},
+            {no:50,cn:"船舶照明系統及航行燈號運作是否正常",en:"Survey Equipment"},
+            {no:51,cn:"船內緊急照明燈及逃生標示是否安裝運作",en:"Installed equipment"},
+            {no:52,cn:"多功能螺桿及起重設備是否安全運作並可使用",en:"Multibeam Single-beam or side-scan sonar"},
+            {no:53,cn:"探測水位的聲納儀器及資料記錄是否準確清晰並可運作",en:"Data acquisition software"},
+            {no:54,cn:"探測系統是否安裝、設定準確並可正常作業",en:"Survey operation"},
+            {no:55,cn:"數據取得系統及資料保存軟體運作正常且有備份",en:"Survey cables connected"},
+            {no:56,cn:"測量電纜連接是否確實並無損壞或鬆動問題",en:"Crew cables connected"},
+            {no:57,cn:"一般工作設備",en:"General Equipment"},
+            {no:58,cn:"繩索(絞盤/救生/拖船繩等)狀況良好且功能正常",en:"Ship parts"},
+            {no:59,cn:"消防設備(滅火器、消防泵、緊急照明等)",en:"Fresh sounders"},
+            {no:60,cn:"船舶泵浦及緊急排水系統運作正常",en:"Bilge pumps tested and operational"},
+            {no:61,cn:"甲板清理工具及船體配件是否完整且運作正常",en:"Decks clean and free of obstructions"},
+            {no:62,cn:"燃料儲存及填充軟管是否安全固定並正常",en:"Mooring lines and anchors displaced"},
+            {no:63,cn:"船體及機房是否乾淨且無雜物堆積",en:"Engine room in good condition"}
+        ];
+
+        let photoData = {};
+
+        function init() {
+            const tbody = document.getElementById('tableBody');
+            items.forEach(item => {
+                photoData[item.no] = [];
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="item-no">${item.no}</td>
+                    <td>
+                        <div style="font-weight:600;margin-bottom:5px;">${item.cn}</div>
+                        <div style="color:#6c757d;font-size:12px;">${item.en}</div>
+                    </td>
+                    <td>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="radio" name="i${item.no}" value="YES" onchange="updateProgress()">
+                                <span style="color:#28a745;">✓ YES</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="i${item.no}" value="NO" onchange="updateProgress()">
+                                <span style="color:#dc3545;">✗ NO</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="i${item.no}" value="N/A" onchange="updateProgress()">
+                                <span style="color:#6c757d;">— N/A</span>
+                            </label>
+                        </div>
+                        <input type="text" class="remarks-input" id="r${item.no}" placeholder="輸入備註...">
+                        <div class="photo-section">
+                            <input type="file" id="photoInput${item.no}" class="hidden" accept="image/*" multiple onchange="handlePhotoUpload(${item.no}, this)">
+                            <button class="photo-upload-btn" onclick="document.getElementById('photoInput${item.no}').click()">
+                                📷 上傳照片
+                            </button>
+                            <div class="photo-gallery" id="photoGallery${item.no}"></div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inspectionDate').value = today;
+            document.getElementById('signDate').value = today;
+        }
+
+        function handlePhotoUpload(itemNo, input) {
+            const files = input.files;
+            if (!files.length) return;
+
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoData[itemNo].push(e.target.result);
+                    renderPhotos(itemNo);
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            input.value = '';
+        }
+
+        function renderPhotos(itemNo) {
+            const gallery = document.getElementById('photoGallery' + itemNo);
+            gallery.innerHTML = '';
+            
+            photoData[itemNo].forEach((photoSrc, index) => {
+                const photoDiv = document.createElement('div');
+                photoDiv.className = 'photo-item';
+                photoDiv.innerHTML = `
+                    <img src="${photoSrc}" alt="Photo ${index + 1}">
+                    <button class="photo-delete" onclick="deletePhoto(${itemNo}, ${index})" title="刪除照片">×</button>
+                `;
+                gallery.appendChild(photoDiv);
+            });
+        }
+
+        function deletePhoto(itemNo, photoIndex) {
+            if (confirm('確定要刪除這張照片嗎？')) {
+                photoData[itemNo].splice(photoIndex, 1);
+                renderPhotos(itemNo);
+            }
+        }
+
+        function updateProgress() {
+            let count = 0;
+            items.forEach(item => {
+                const radios = document.getElementsByName('i' + item.no);
+                for (let r of radios) {
+                    if (r.checked) {
+                        count++;
+                        break;
+                    }
+                }
+            });
+            const pct = Math.round((count / items.length) * 100);
+            const bar = document.getElementById('progressBar');
+            bar.style.width = pct + '%';
+            bar.textContent = `完成進度: ${count}/${items.length} (${pct}%)`;
+        }
+
+        function handleSave() {
+            const data = {
+                vesselName: document.getElementById('vesselName').value,
+                port: document.getElementById('port').value,
+                inspectionDate: document.getElementById('inspectionDate').value,
+                inspectorName: document.getElementById('inspectorName').value,
+                signature: document.getElementById('signature').value,
+                signDate: document.getElementById('signDate').value,
+                items: {},
+                photos: photoData
+            };
+
+            items.forEach(item => {
+                const radios = document.getElementsByName('i' + item.no);
+                let val = '';
+                for (let r of radios) {
+                    if (r.checked) {
+                        val = r.value;
+                        break;
+                    }
+                }
+                data.items[item.no] = {
+                    status: val,
+                    remarks: document.getElementById('r' + item.no).value
+                };
+            });
+
+            try {
+                localStorage.setItem('vesselCheck', JSON.stringify(data));
+                alert('✅ 檢查表已成功儲存！');
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') {
+                    alert('❌ 儲存失敗：照片過多，請減少照片數量或壓縮照片大小。');
+                } else {
+                    alert('❌ 儲存失敗：' + e.message);
+                }
+            }
+        }
+
+        function handleLoad() {
+            const saved = localStorage.getItem('vesselCheck');
+            if (!saved) {
+                alert('❌ 沒有找到已儲存的檢查表資料！');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(saved);
+                
+                document.getElementById('vesselName').value = data.vesselName || '';
+                document.getElementById('port').value = data.port || '';
+                document.getElementById('inspectionDate').value = data.inspectionDate || '';
+                document.getElementById('inspectorName').value = data.inspectorName || '';
+                document.getElementById('signature').value = data.signature || '';
+                document.getElementById('signDate').value = data.signDate || '';
+
+                items.forEach(item => {
+                    if (data.items[item.no]) {
+                        const st = data.items[item.no].status;
+                        if (st) {
+                            const radio = document.querySelector(`input[name="i${item.no}"][value="${st}"]`);
+                            if (radio) radio.checked = true;
+                        }
+                        document.getElementById('r' + item.no).value = data.items[item.no].remarks || '';
+                    }
+                });
+
+                if (data.photos) {
+                    photoData = data.photos;
+                    items.forEach(item => {
+                        if (photoData[item.no]) {
+                            renderPhotos(item.no);
+                        }
+                    });
+                }
+
+                updateProgress();
+                alert('✅ 檢查表已成功載入！');
+            } catch (e) {
+                alert('❌ 載入失敗：' + e.message);
+            }
+        }
+
+        function handleClear() {
+            if (!confirm('⚠️ 確定要清空所有表單內容（包含照片）嗎？此操作無法復原！')) {
+                return;
+            }
+
+            document.getElementById('vesselName').value = '';
+            document.getElementById('port').value = '';
+            document.getElementById('inspectorName').value = '';
+            document.getElementById('signature').value = '';
+
+            items.forEach(item => {
+                const radios = document.getElementsByName('i' + item.no);
+                radios.forEach(r => r.checked = false);
+                document.getElementById('r' + item.no).value = '';
+                photoData[item.no] = [];
+                renderPhotos(item.no);
+            });
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inspectionDate').value = today;
+            document.getElementById('signDate').value = today;
+
+            updateProgress();
+            alert('✅ 表單已清空！');
+        }
+
+        function generateReportHTML() {
+            // Collect all data
+            const vesselName = document.getElementById('vesselName').value || '未填寫';
+            const port = document.getElementById('port').value || '未填寫';
+            const inspectionDate = document.getElementById('inspectionDate').value || '未填寫';
+            const inspectorName = document.getElementById('inspectorName').value || '未填寫';
+            const signature = document.getElementById('signature').value || '未填寫';
+            const signDate = document.getElementById('signDate').value || '未填寫';
+
+            let tableRows = '';
+            items.forEach(item => {
+                const radios = document.getElementsByName('i' + item.no);
+                let status = '未填寫';
+                let statusColor = '#6c757d';
+                for (let r of radios) {
+                    if (r.checked) {
+                        status = r.value;
+                        if (status === 'YES') statusColor = '#28a745';
+                        else if (status === 'NO') statusColor = '#dc3545';
+                        break;
+                    }
+                }
+                const remarks = document.getElementById('r' + item.no).value || '無';
+
+                let photosHTML = '';
+                if (photoData[item.no] && photoData[item.no].length > 0) {
+                    photosHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;">';
+                    photoData[item.no].forEach(photo => {
+                        photosHTML += `<div style="border:1px solid #ddd;border-radius:8px;overflow:hidden;aspect-ratio:1;">
+                            <img src="${photo}" style="width:100%;height:100%;object-fit:cover;">
+                        </div>`;
+                    });
+                    photosHTML += '</div>';
+                }
+
+                tableRows += `
+                    <tr>
+                        <td style="text-align:center;font-weight:600;color:#667eea;">${item.no}</td>
+                        <td>
+                            <div style="font-weight:600;margin-bottom:5px;">${item.cn}</div>
+                            <div style="color:#6c757d;font-size:12px;">${item.en}</div>
+                        </td>
+                        <td>
+                            <div style="color:${statusColor};font-weight:600;margin-bottom:8px;">狀態: ${status}</div>
+                            <div style="color:#495057;margin-bottom:8px;">備註: ${remarks}</div>
+                            ${photosHTML}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const html = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>船舶檢查報告 - ${vesselName}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            background: #f8f9fa;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .info-section {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .info-item {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+        }
+        .info-item label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .info-item div {
+            color: #212529;
+            font-size: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background: #1e3c72;
+            color: white;
+        }
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
+        }
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .signature-section {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+        }
+        @media print {
+            body { padding: 0; background: white; }
+            .container { box-shadow: none; }
+        }
+        @media (max-width: 768px) {
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚢 船舶檢查報告</h1>
+            <p>SURVEY BOAT INSPECTION REPORT - NMDC STANDARD</p>
+        </div>
+        
+        <div class="info-section">
+            <h3 style="color:#1e3c72;margin-bottom:15px;">📋 基本資訊</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>船名 Vessel Name</label>
+                    <div>${vesselName}</div>
+                </div>
+                <div class="info-item">
+                    <label>檢查港口 Port</label>
+                    <div>${port}</div>
+                </div>
+                <div class="info-item">
+                    <label>檢查日期 Date</label>
+                    <div>${inspectionDate}</div>
+                </div>
+                <div class="info-item">
+                    <label>檢查員 Inspector</label>
+                    <div>${inspectorName}</div>
+                </div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:60px;">項次</th>
+                    <th style="width:35%;">檢查項目</th>
+                    <th style="width:65%;">檢查結果 / 照片 / 備註</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+        </table>
+
+        <div class="signature-section">
+            <h3 style="color:#1e3c72;margin-bottom:15px;">✍️ 簽名</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>檢查員簽名</label>
+                    <div>${signature}</div>
+                </div>
+                <div class="info-item">
+                    <label>簽名日期</label>
+                    <div>${signDate}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+
+            return html;
+        }
+
+        async function handleShare() {
+            try {
+                const html = generateReportHTML();
+                const blob = new Blob([html], { type: 'text/html' });
+                
+                const vesselName = document.getElementById('vesselName').value || '船舶';
+                const date = document.getElementById('inspectionDate').value || new Date().toISOString().split('T')[0];
+                const fileName = `船舶檢查報告_${vesselName}_${date}.html`;
+
+                // Check if Web Share API is supported (mainly mobile devices)
+                if (navigator.share && navigator.canShare) {
+                    const file = new File([blob], fileName, { type: 'text/html' });
+                    
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: `船舶檢查報告 - ${vesselName}`,
+                            text: `檢查日期: ${date}`,
+                            files: [file]
+                        });
+                        return;
+                    }
+                }
+
+                // Fallback: Download the file
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert('✅ 報告已下載！您可以透過檔案管理員分享這個檔案。');
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    alert('❌ 分享失敗：' + error.message);
+                }
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
